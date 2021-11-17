@@ -1,0 +1,31 @@
+reset
+!new University('UMA')
+!UMA.name:='Universidad de Malaga'
+
+!new Grade('software')
+!software.name:='Ingenieria del Software'
+
+!new Student('av2')
+!pp.name:='AV2'
+
+!new Certificate('ingenieroav')
+
+!insert (UMA,software) into Offer
+
+!new Course('modelado')
+!modelado.name:='Modelado y Diseño del Software'
+!modelado.credits:=240
+!modelado.year:=2021'
+
+!new Teacher('av')
+!av.name:='AV1'
+
+!insert (av2,ingenieroav) into Own
+!insert (software,ingenieroav) into Issue
+!insert (av2,software) into Qualify
+!insert (software,modelado) into Programme
+!insert (av,modelado) into Impart
+!insert (av2,modelado) into Matriculation
+!Matriculation1.mark:=5
+
+check

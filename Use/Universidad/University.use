@@ -1,0 +1,149 @@
+model University
+
+class University
+attributes
+    name : String
+end
+
+abstract class Degree
+attributes
+    name : String
+end
+
+class Grade < Degree
+end
+
+class Master < Degree
+end
+
+class Course
+attributes
+    name : String
+    credits : Integer
+    year : Integer
+end
+
+abstract class User
+attributes
+    name : String
+end
+
+class Student < User
+end
+
+class Teacher < User
+end
+
+associationclass Matriculation between
+    User [*] role coursedBy
+    Course [*] role coursing
+attributes
+    mark : Real
+end
+
+association Impart between
+    Teacher [1] role taughtBy
+    Course [*] role teaches
+end
+
+class Certificate
+attributes
+    year : Integer derive = self.owner.matriculation -> select(x | self.issuedBy.courses -> includes(x.coursing) and x.mark >= 5).coursing.year -> max()
+    year2 : Integer derive = if(self.year = null) then(self.owner.matriculation -> select(x | self.issuedBy.courses -> includes(x.coursing) and x.mark >= 5).coursing.year -> max()) else(self.year2) endif
+end
+
+association Offer between
+    University [1] role offerer
+    Degree [1..*] role offered
+end
+
+aggregation Programme between
+    Degree [1..*] role belonging
+    Course [1..*] role courses
+end
+
+association Own between
+    User [1] role owner
+    Certificate [*] role certificates
+end
+
+association Issue between
+    Degree [1] role issuedBy
+    Certificate [*] role issued
+end
+
+class Qualify between
+    User [*] role studiedBy
+    Degree [*] role studies
+attributes
+    obtainedCredits : Integer derive = self.studiedBy.matriculation->select(x : Matriculation | x.coursing.belonging->includes(self.studies) and x.mark >= 5).coursing.credits->sum()
+end
+
+constraints
+
+-- Restriccion de certificado de grado y master
+context Certificate inv DegreeRequirements:
+    --self.owner.qualify->select(x | x.studies=self.issuedBy and x.studies.oclIsTypeOf(Grade)).obtainedCredits->asSequence()->first()>=240
+    self.year <> null and self.owner.qualify->forAll(x | x.studies=self.issuedBy implies if x.studies.oclIsTypeOf(Grade)
+                                                                then x.obtainedCredits>=240
+                                                                else x.obtainedCredits>=60
+                                                            endif)
+
+
+context Matriculation inv ValidMarks:
+    self.mark <> null implies self.mark >= 0 and self.mark <= 10
+
+context Course inv ValidCredits:
+    self.credits >= 0 and self.credits <= 240
+
+context Teacher inv NonSelfTeaching:   
+    self.coursing->forAll(x | self.teaches->forAll(y | y.name = x.name implies x.year < y.year))
+
+-- No puede existir qualify si no se está matriculado en al menos una asignatura de ese grado o master
+context Qualify inv ToQualify:
+    self.studiedBy.coursing -> select(x | self.studies.courses->includes(x))->size()>0
+
+-- Si un alumno está matriculado en una asignatura de grado o master implica que existe qualify a ese grado o master
+context Matriculation inv ToMatriculation:
+    self.coursedBy.studies <> null and self.coursedBy.studies->includesAll(self.coursing.belonging)
+
+
+context Degree inv GradeOrMaster:
+     self.oclIsKindOf(Grade) xor self.oclIsKindOf(Master)
+
+context User inv StudentOrTeacher:
+     self.oclIsKindOf(Student) xor self.oclIsKindOf(Teacher)
+
+context User inv ToStudyMaster:
+--mal    self.studies <> null implies self.studies->forAll(x | x.oclIsTypeOf(Master) implies self.certificates.issuedBy.oclIsTypeOf(Grade) <> null)
+--mal    self.studies <> null implies self.coursing->forAll(x | x.belonging->forAll(y | y.oclIsTypeOf(Master) implies self.certificates.issuedBy->select(z | z.oclIsTypeOf(Grade)) <> null))
+--mal    self.studies <> null implies self.coursing->select(x | x.belonging->select(y | y.oclIsTypeOf(Master))->size()>0)->size()>0 implies self.certificates.issuedBy->select(z | z.oclIsTypeOf(Grade)) <> null
+    (self.studies -> select(x | x.oclIsTypeOf(Master))->size() <> 0 and self.coursing.belonging -> select(x | x.oclIsTypeOf(Master))->size() <> 0) implies (self.certificates <> null and self.certificates.issuedBy -> select(x | x.oclIsTypeOf(Grade))->size() <> 0)
+-- Alumno no puede matricularse de nuevo en asignatura aprobada
+context User inv Only1CoursePassed:
+    self.matriculation->forAll(x | x.mark >= 5 implies self.matriculation->select(y | y.coursing.name = x.coursing.name)->forAll(z | z.coursing.year <= x.coursing.year)) 
+
+-- Alumno con titulo de grado no puede matricularse en asignatura de ese grado
+context Certificate inv HasDegreeAlready:
+    self.owner.coursing -> select(x | x.belonging -> select(y | y = self.issuedBy) -> size > 0) -> size() > 0 implies self.owner.coursing -> select(x | x.belonging -> select(y | y = self.issuedBy) -> size() > 0) -> forAll(x | x.year <= self.year)
+    
+-- Alumno con Asignatura sólo puede tener una relación en un mismo año
+context User inv DifferentYearCourse:
+    self.coursing <> null implies self.matriculation->forAll(x | self.matriculation->forAll(y | x <> y and x.coursing.name = y.coursing.name implies x.coursing.year<>y.coursing.year))
+    
+context User inv NotNullNameUser:
+    self.name <> null
+
+context University inv NotNullNameUniversity:
+    self.name <> null
+
+context Degree inv NotNullNameDegree:
+    self.name <> null
+
+context Course inv NotNullNameCourse:
+    self.name <> null
+
+--Un profesor no puede estar matriculado posteriormente de una asignatura que ha impartido
+
+
+
