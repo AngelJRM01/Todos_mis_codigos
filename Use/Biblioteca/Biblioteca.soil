@@ -1,0 +1,141 @@
+reset
+
+--Crear Biblioteca
+!new Biblioteca('UMA') 
+!UMA.Nombre := 'UMA'
+
+--Crear Reloj
+!new Reloj('Reloj1')
+!Reloj1.Dia := 0
+
+--Crear Libros
+!new Libros('DonQuijote')
+!DonQuijote.Nombre := 'Don Quijote De La Mancha'
+!DonQuijote.Autor := 'Miguel De Cervantes'
+!new Libros('HarryPotter1')
+!HarryPotter1.Nombre := 'Harry Potter y la piedra filosofal'
+!HarryPotter1.Autor := 'J. K. Rowling'
+!new Libros('HarryPotter2')
+!HarryPotter2.Nombre := 'Harry Potter y la camara secreta'
+!HarryPotter2.Autor := 'J. K. Rowling'
+!new Libros('HarryPotter3')
+!HarryPotter3.Nombre := 'Harry Potter y el prisionero de Azkaban'
+!HarryPotter3.Autor := 'J. K. Rowling'
+!new Libros('HarryPotter4')
+!HarryPotter4.Nombre := 'Harry Potter y el caliz de fuego'
+!HarryPotter4.Autor := 'J. K. Rowling'
+!new Libros('HarryPotter5')
+!HarryPotter5.Nombre := 'Harry Potter y la Orden del Fenix'
+!HarryPotter5.Autor := 'J. K. Rowling'
+!new Libros('HarryPotter6')
+!HarryPotter6.Nombre := 'Harry Potter y el misterio del principe'
+!HarryPotter6.Autor := 'J. K. Rowling'
+!new Libros('HarryPotter7')
+!HarryPotter7.Nombre := 'Harry Potter y las reliquias de la Muerte'
+!HarryPotter7.Autor := 'J. K. Rowling'
+!new Libros('HarryPotter8')
+!HarryPotter8.Nombre := 'Harry Potter y el legado maldito'
+!HarryPotter8.Autor := 'J. K. Rowling'
+
+--Crear Revistas
+!new Revistas('Hola1')
+!Hola1.Nombre := 'Hola n1'
+!new Revistas('Hola2')
+!Hola2.Nombre := 'Hola n2'
+!new Revistas('Hola3')
+!Hola3.Nombre := 'Hola n3'
+!new Revistas('Hola4')
+!Hola4.Nombre := 'Hola n4'
+!new Revistas('Hola5')
+!Hola5.Nombre := 'Hola n5'
+!new Revistas('Hola6')
+!Hola6.Nombre := 'Hola n6'
+!new Revistas('Hola7')
+!Hola7.Nombre := 'Hola n7'
+!new Revistas('Hola8')
+!Hola8.Nombre := 'Hola n8'
+
+--Craer EstudiantesGrado
+!new Profesor('Angel')
+!Angel.Nombre := 'Angel'
+!Angel.Edad := 20
+!new Profesor('Angel2')
+!Angel2.Nombre := 'Angel2'
+!Angel2.Edad := 20
+
+--Crear relaciones de CompuestoPo
+!insert (UMA,HarryPotter1) into CompuestoPor
+!insert (UMA,HarryPotter2) into CompuestoPor
+!insert (UMA,HarryPotter3) into CompuestoPor
+!insert (UMA,HarryPotter4) into CompuestoPor
+!insert (UMA,HarryPotter5) into CompuestoPor
+!insert (UMA,HarryPotter6) into CompuestoPor
+!insert (UMA,HarryPotter7) into CompuestoPor
+!insert (UMA,HarryPotter8) into CompuestoPor
+!insert (UMA,DonQuijote) into CompuestoPor
+!insert (UMA,Hola1) into CompuestoPor
+!insert (UMA,Hola2) into CompuestoPor
+!insert (UMA,Hola3) into CompuestoPor
+!insert (UMA,Hola4) into CompuestoPor
+!insert (UMA,Hola5) into CompuestoPor
+!insert (UMA,Hola6) into CompuestoPor
+!insert (UMA,Hola7) into CompuestoPor
+!insert (UMA,Hola8) into CompuestoPor
+
+--Crear relaciones Prestamo
+!insert (Angel2, DonQuijote) into Prestamo
+!Prestamo1.DiaComienzo := 0
+!Prestamo1.DiaFinal := 2
+!insert (Angel2, HarryPotter1) into Prestamo
+!Prestamo2.DiaComienzo := 1
+!Prestamo2.DiaFinal := 5
+!insert (Angel2, Hola2) into Prestamo
+!Prestamo3.DiaComienzo := 0
+!Prestamo3.DiaFinal := 3 
+!insert (Angel2, Hola1) into Prestamo
+!Prestamo4.DiaComienzo := 0
+!Prestamo4.DiaFinal := 2 
+!insert (Angel2, HarryPotter3) into Prestamo
+!Prestamo5.DiaComienzo := 0
+!Prestamo5.DiaFinal := 6 
+!insert (Angel2, HarryPotter4) into Prestamo
+!Prestamo6.DiaComienzo := 0
+!Prestamo6.DiaFinal := 6 
+!insert (Angel2, HarryPotter5) into Prestamo
+!Prestamo7.DiaComienzo := 0
+!Prestamo7.DiaFinal := 6 
+!insert (Angel2, HarryPotter6) into Prestamo
+!Prestamo8.DiaComienzo := 0
+!Prestamo8.DiaFinal := 6  
+!insert (Angel2, HarryPotter2) into Prestamo
+!Prestamo9.DiaComienzo := 0
+!Prestamo9.DiaFinal := 6  
+!insert (Angel2, HarryPotter7) into Prestamo
+!Prestamo10.DiaComienzo := 0
+!Prestamo10.DiaFinal := 6  
+!insert (Angel2, HarryPotter8) into Prestamo
+!Prestamo11.DiaComienzo := 0
+!Prestamo11.DiaFinal := 55
+!insert (Angel2, Hola3) into Prestamo
+!Prestamo12.DiaComienzo := 0
+!Prestamo12.DiaFinal := 2 
+!insert (Angel2, Hola4) into Prestamo
+!Prestamo13.DiaComienzo := 0
+!Prestamo13.DiaFinal := 2 
+!insert (Angel2, Hola5) into Prestamo
+!Prestamo14.DiaComienzo := 0
+!Prestamo14.DiaFinal := 2 
+!insert (Angel2, Hola6) into Prestamo
+!Prestamo15.DiaComienzo := 0
+!Prestamo15.DiaFinal := 2 
+!insert (Angel2, Hola7) into Prestamo
+!Prestamo16.DiaComienzo := 0
+!Prestamo16.DiaFinal := 14 
+
+
+!insert (Reloj1,UMA) into Tiempo
+!insert (Angel,UMA) into Registrados
+!insert (Angel2,UMA) into Registrados
+
+--Checkear
+check

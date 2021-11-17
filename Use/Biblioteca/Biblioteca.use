@@ -1,0 +1,130 @@
+model Biblioteca
+
+abstract class Persona
+attributes
+    Nombre : String
+    Edad : Integer
+end
+
+class Bibliotecario < Persona
+end
+
+abstract class Usuario < Persona
+end
+
+class EstudiantePosGrado < Usuario
+end
+
+class EstudianteGrado < Usuario
+end
+
+class Profesor < Usuario
+end
+
+class Reloj
+attributes
+    Dia : Integer init : 0
+end
+
+abstract class Contenido
+attributes
+    Nombre : String
+end
+
+class Libros < Contenido
+attributes
+    Autor : String
+end
+
+class Revistas < Contenido
+end
+
+class Biblioteca
+attributes
+    Nombre : String
+end
+
+aggregation CompuestoPor between
+    Biblioteca [*] role perteneceA
+    Contenido [*] role formadoPor
+end
+
+associationclass Prestamo between
+    Usuario [*] role esCogidoPor
+    Contenido [*] role coge
+attributes
+    DiaComienzo : Integer init : 0
+    DiaFinal : Integer init : 0
+end
+
+associationclass Trabajo between
+    Bibliotecario [1..*] role trabajan
+    Biblioteca [1..*] role trabajaEn
+attributes
+    Salario : Integer init : 0
+end
+
+association Registrados between
+    Usuario [*] role hay
+    Biblioteca [*] role estaRegistradoEn
+end
+
+association Tiempo between
+    Reloj [1..*] role tiene
+    Biblioteca [1..*] role estaEn
+end
+
+constraints
+
+--Bien
+
+context Reloj inv diaMenorADiaFinalPrestamo:
+    self.estaEn <> null implies self.estaEn -> forAll(x | x.formadoPor -> forAll(y | y.prestamo -> forAll(z | z.DiaFinal >= self.Dia)))
+
+context Biblioteca inv noMasDeUnPrestamoPorContenidoAlMismoTiempo:
+    self.formadoPor <> null implies self.formadoPor -> forAll(x | x.esCogidoPor -> size() <= 1)
+
+context Biblioteca inv noContenidoConMismoNombre:
+    self.formadoPor <> null implies self.formadoPor -> forAll(x | self.formadoPor -> forAll(y | y <> x implies x.Nombre <> y.Nombre))
+
+context Persona inv edadPositiva:
+    self.Edad >= 0
+
+context Persona inv personaTengaNombre:
+    self.Nombre <> null
+
+context Contenido inv contenidoTengaNombre:
+    self.Nombre <> null
+
+context Libros inv contenidoTengaAutor:
+    self.Autor <> null
+
+context Biblioteca inv bibliotecaTengaNombre:
+    self.Nombre <> null
+
+context EstudianteGrado inv numeroLibrosGrado:
+    self.coge <> null implies ((self.coge -> select(x | x.oclIsTypeOf(Revistas)) -> size() = 0) and (self.coge -> select(x | x.oclIsTypeOf(Libros)) -> size() <= 3))
+
+context EstudianteGrado inv tiempoMaximoLibrosGrado:
+    self.prestamo <> null implies (self.prestamo -> forAll(x | x.DiaComienzo + 7 >= x.DiaFinal and x.DiaComienzo <= x.DiaFinal))
+
+context EstudiantePosGrado inv numeroLibrosRevistasPosGrado:
+    self.coge <> null implies (self.coge -> size() <= 8)
+
+context EstudiantePosGrado inv tiempoMaximoLibrosPosGrado:
+    self.coge <> null implies self.coge -> select(x | x.oclIsTypeOf(Libros)) -> forAll(y | y.prestamo <> null implies y.prestamo -> forAll(x | x.DiaComienzo + 14 >= x.DiaFinal and x.DiaComienzo < x.DiaFinal))
+
+context EstudiantePosGrado inv tiempoMaximoRevistasPosGrado:
+    self.coge <> null implies self.coge -> select(x | x.oclIsTypeOf(Revistas)) -> forAll(y | y.prestamo <> null implies y.prestamo -> forAll(x | x.DiaComienzo + 3 >= x.DiaFinal and x.DiaComienzo < x.DiaFinal))
+
+context Profesor inv numeroLibrosRevistasProfesor:
+    self.coge <> null implies (self.coge -> size() <= 16)
+
+context Profesor inv tiempoMaximoLibrosProfesor:
+    self.coge <> null implies self.coge -> select(x | x.oclIsTypeOf(Libros)) -> forAll(y | y.prestamo <> null implies y.prestamo -> forAll(x | x.DiaComienzo + 56 >= x.DiaFinal and x.DiaComienzo < x.DiaFinal))
+
+context Profesor inv tiempoMaximoRevistasProfesor:
+    self.coge <> null implies self.coge -> select(x | x.oclIsTypeOf(Revistas)) -> forAll(y | y.prestamo <> null implies y.prestamo -> forAll(x | x.DiaComienzo + 14 >= x.DiaFinal and x.DiaComienzo < x.DiaFinal))
+
+context Biblioteca inv estaRegistrado:
+    self.formadoPor <> null implies self.formadoPor -> forAll(x | x.prestamo <> null implies x.esCogidoPor -> forAll(y | self.hay -> includes(y)))
